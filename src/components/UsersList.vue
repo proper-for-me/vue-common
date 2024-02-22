@@ -4,11 +4,9 @@
     <button @click=getUserLists>목록 조회</button>
     <!-- <label> name : </label> <input value="aaaa" /> -->
     <!-- <button @click="(event) => warn('Form cannot be submitted yet.', event)"> search</button> -->
-    <ul>
-      <li v-for="user in users" :key="user.id" @click="(event) => getUser(event, user.id)" id="'{user.id}'">이름 :: {{
-        user.name
-      }}, 나이: {{
-  user.age }} </li>
+    <ul v-if="users != null">
+      <li v-for="user in users" :key="user.id" @click="(event) => getUser(event, user.id)" id="'{user.id}'">
+        이름 :: {{ user.name }}, 나이: {{ user.age }} </li>
     </ul>
     <br>
     -------------------------------------------------------------------------------------------------
@@ -22,14 +20,21 @@
     -------------------------------------------------------------------------------------------------
     <br>
     <div class="user-add">
-      <input type="text" />
-      <input type="text" />
-      <!-- <input type="text" v-model="state.person?.name" /> <br />
-      <input type="text" v-model="state.person?.age" /> <br /> -->
+      <p>{{ }}</p>
+      <!-- <label>id : </label><input type="text" v-model="regUserId">
+      <label>Name : </label><input type="text" v-model="regUserName">
+      <label>age : </label><input type="text" v-model="regUserAge"> -->
+
 
       <button @click="registerUser(event)">저장</button>
-    </div>
 
+      <br>
+      <label>id : </label><input type="text" v-model="regAlter.id">
+      <label>name : </label><input type="text" v-model="regAlter.name">
+      <label>age : </label><input type="text" v-model="regAlter.age">
+    </div>
+    <!-- <p>Message is: {{ message }}</p>
+    <input v-model="message" placeholder="edit me" /> -->
   </div>
 </template>
 
@@ -52,6 +57,15 @@ const state = reactive({
 });
 
 const users = ref(null);
+const regUserId = ref('');
+const regUserName = ref('');
+const regUserAge = ref(0);
+
+const regAlter = ref({
+  id: '',
+  name: '',
+  age: ''
+});
 
 function getUserLists() {
   axiosInstance.get('users')
@@ -75,14 +89,25 @@ function getUser(event, id) {
 }
 
 async function registerUser() {
+  console.log(`파라미터 가져 오기 :: ${regUserId.value}   ${regUserName.value}, ${regAlter.value} `);
+  const { id, name, age } = regAlter.value;
+  // console.dir(id)
+  // console.dir(name)
+  // console.dir(age)
+
+  const data = {
+    id: id,
+    name: name,
+    age: age
+  }
 
   const person = await axiosInstance.post(
-    "person",
-    {
-      name: this.name,
-      age: this.age
-    }
+    "users", data
   );
+
+  if (person) {
+    getUserLists();
+  }
   console.log(person)
 }
 
